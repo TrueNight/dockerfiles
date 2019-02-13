@@ -30,7 +30,7 @@ RUN echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90$RUN_USER \
 # add build user
 RUN groupadd --gid 3434 $RUN_USER \
   && useradd --uid 3434 --gid $RUN_USER --shell /bin/bash --create-home $RUN_USER \
-  && echo '$RUN_USER ALL=NOPASSWD: ALL' >> /etc/sudoers.d/50-$RUN_USER \
+  && echo "$RUN_USER ALL=NOPASSWD: ALL" >> /etc/sudoers.d/50-$RUN_USER \
   && echo 'Defaults    env_keep += "DEBIAN_FRONTEND"' >> /etc/sudoers.d/env_keep
 
 # BEGIN IMAGE CUSTOMIZATIONS
@@ -78,17 +78,6 @@ RUN sudo apt-get update && \
         libcurl4-openssl-dev libglu1-mesa libxi-dev libxmu-dev \
         libglu1-mesa-dev
 
-# Install Ruby
-RUN cd /tmp && wget -O ruby-install-0.6.1.tar.gz https://github.com/postmodern/ruby-install/archive/v0.6.1.tar.gz && \
-    tar -xzvf ruby-install-0.6.1.tar.gz && \
-    cd ruby-install-0.6.1 && \
-    sudo make install && \
-    ruby-install --cleanup ruby 2.4.3 && \
-    rm -r /tmp/ruby-install-*
-
-ENV PATH ${HOME}/.rubies/ruby-2.4.3/bin:${PATH}
-RUN echo 'gem: --env-shebang --no-rdoc --no-ri' >> ~/.gemrc && gem install bundler
-
 # Download and install Android SDK
 RUN sudo mkdir -p ${android_home} && \
     sudo chown -R $RUN_USER:$RUN_USER ${android_home} && \
@@ -127,5 +116,5 @@ RUN sdkmanager \
   "build-tools;28.0.2" \
   "build-tools;28.0.3"
 
-# API_LEVEL string gets replaced by m4
+# API_LEVEL
 RUN sdkmanager "platforms;android-28"
