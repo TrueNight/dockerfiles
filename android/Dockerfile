@@ -100,4 +100,9 @@ RUN sdkmanager \
   "build-tools;28.0.3"
 
 # API_LEVEL
-RUN sdkmanager "platforms;android-28"
+RUN sdkmanager \
+  "platforms;android-24" \
+  "platforms;android-25" \
+  "platforms;android-26" \
+  "platforms;android-27" \
+  "platforms;android-28"
