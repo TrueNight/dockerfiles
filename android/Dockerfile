@@ -21,49 +21,33 @@ RUN ln -sf /usr/share/zoneinfo/Etc/UTC /etc/localtime
 ENV LANG=C.UTF-8
 RUN locale-gen $LANG || true
 
-ENV RUN_USER androidci
-
 # make Apt non-interactive
-RUN echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90$RUN_USER \
-  && echo 'DPkg::Options "--force-confnew";' >> /etc/apt/apt.conf.d/90$RUN_USER
-
-# add build user
-RUN groupadd --gid 3434 $RUN_USER \
-  && useradd --uid 3434 --gid $RUN_USER --shell /bin/bash --create-home $RUN_USER \
-  && echo "$RUN_USER ALL=NOPASSWD: ALL" >> /etc/sudoers.d/50-$RUN_USER \
-  && echo 'Defaults    env_keep += "DEBIAN_FRONTEND"' >> /etc/sudoers.d/env_keep
+RUN echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90root \
+  && echo 'DPkg::Options "--force-confnew";' >> /etc/apt/apt.conf.d/90root
 
 # BEGIN IMAGE CUSTOMIZATIONS
 # END IMAGE CUSTOMIZATIONS
 
-USER $RUN_USER
-
 CMD ["/bin/sh"]
-
-
-# Now commands run as user `$RUN_USER`
-
-# Switching user can confuse Docker's idea of $HOME, so we set it explicitly
-ENV HOME /home/$RUN_USER
 
 # Install Google Cloud SDK
 
-RUN sudo apt-get update -qqy && sudo apt-get install -qqy \
+RUN apt-get update -qqy && apt-get install -qqy \
         python-dev \
         python-setuptools \
         apt-transport-https \
         lsb-release
 
-RUN sudo apt-get install gcc-multilib && \
-    sudo easy_install -U pip && \
-    sudo pip uninstall crcmod && \
-    sudo pip install -U crcmod
+RUN apt-get install gcc-multilib && \
+    easy_install -U pip && \
+    pip uninstall crcmod && \
+    pip install -U crcmod
 
 RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-    echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+    echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
-RUN sudo apt-get update && sudo apt-get install -y google-cloud-sdk && \
+RUN apt-get update && apt-get install -y google-cloud-sdk && \
     gcloud config set core/disable_usage_reporting true && \
     gcloud config set component_manager/disable_update_check true
 
@@ -72,15 +56,14 @@ ARG android_home=/opt/android/sdk
 
 # SHA-256 444e22ce8ca0f67353bda4b85175ed3731cae3ffa695ca18119cbacef1c1bea0
 
-RUN sudo apt-get update && \
-    sudo apt-get install --yes \
+RUN apt-get update && \
+    apt-get install --yes \
         xvfb lib32z1 lib32stdc++6 build-essential \
         libcurl4-openssl-dev libglu1-mesa libxi-dev libxmu-dev \
         libglu1-mesa-dev
 
 # Download and install Android SDK
-RUN sudo mkdir -p ${android_home} && \
-    sudo chown -R $RUN_USER:$RUN_USER ${android_home} && \
+RUN mkdir -p ${android_home} && \
     curl --silent --show-error --location --fail --retry 3 --output /tmp/${sdk_version} https://dl.google.com/android/repository/${sdk_version} && \
     unzip -q /tmp/${sdk_version} -d ${android_home} && \
     rm /tmp/${sdk_version}
@@ -118,5 +101,3 @@ RUN sdkmanager \
 
 # API_LEVEL
 RUN sdkmanager "platforms;android-28"
-
-USER root
