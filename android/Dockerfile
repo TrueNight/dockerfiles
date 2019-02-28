@@ -118,3 +118,5 @@ RUN sdkmanager \
 
 # API_LEVEL
 RUN sdkmanager "platforms;android-28"
+
+USER root
