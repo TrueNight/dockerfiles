@@ -34,12 +34,12 @@ CMD ["/bin/sh"]
 
 RUN apt-get update -qqy && apt-get install -qqy \
         python-dev \
+        python-pip \
         python-setuptools \
         apt-transport-https \
         lsb-release
 
 RUN apt-get install gcc-multilib && \
-    easy_install -U pip && \
     pip uninstall crcmod && \
     pip install -U crcmod
 
