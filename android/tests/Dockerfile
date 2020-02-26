@@ -6,4 +6,4 @@ LABEL maintainer="mike@truenight.xyz"
 RUN sdkmanager "system-images;android-29;google_apis;x86"
 
 # Create emulator
-RUN avdmanager create avd -n emulator-29 -k "system-images;android-29;google_apis;x86"
+RUN echo no | avdmanager create avd --force -n emulator -k 'system-images;android-29;google_apis;x86'
