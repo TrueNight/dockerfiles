@@ -51,7 +51,7 @@ RUN apt-get update && apt-get install -y google-cloud-sdk && \
     gcloud config set core/disable_usage_reporting true && \
     gcloud config set component_manager/disable_update_check true
 
-ARG sdk_version=sdk-tools-linux-3859397.zip
+ARG sdk_version=sdk-tools-linux-4333796.zip
 ARG android_home=/opt/android/sdk
 
 # SHA-256 444e22ce8ca0f67353bda4b85175ed3731cae3ffa695ca18119cbacef1c1bea0
